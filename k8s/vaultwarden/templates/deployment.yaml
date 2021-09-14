@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vaultwarden.fullname" . }}
+  labels:
+    {{- include "vaultwarden.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "vaultwarden.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "vaultwarden.selectorLabels" . | nindent 8 }}
+    spec:
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.existingClaim }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.targetPort }}
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        env:
+        - name: DOMAIN
+          value: https://{{ $.Values.ingress.hostname }}
+        - name: SIGNUPS_ALLOWED
+          value: {{ $.Values.common.signups.enabled | quote }}
+        {{- if $.Values.common.smtp.enabled }}
+        - name: SMTP_HOST
+          valueFrom:
+            secretKeyRef:
+              name: {{ $.Values.common.smtp.secret.name }}
+              key: {{ $.Values.common.smtp.secret.hostKey }}
+        - name: SMTP_PORT
+          value: {{ $.Values.common.smtp.port | quote }}
+        - name: SMTP_SECURITY
+          value: {{ $.Values.common.smtp.security }}
+        - name: SMTP_FROM
+          valueFrom:
+            secretKeyRef:
+              name: {{ $.Values.common.smtp.secret.name }}
+              key: {{ $.Values.common.smtp.secret.fromKey }}
+        - name: SMTP_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ $.Values.common.smtp.secret.name }}
+              key: {{ $.Values.common.smtp.secret.usernameKey }}
+        - name: SMTP_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ $.Values.common.smtp.secret.name }}
+              key: {{ $.Values.common.smtp.secret.passwordKey }}
+        {{- end }}
+        {{- if $.Values.common.pushNotification.enabled }}
+        - name: PUSH_ENABLED
+          value: "true"
+        - name: PUSH_INSTALLATION_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ $.Values.common.pushNotification.secret.name }}
+              key: {{ $.Values.common.pushNotification.secret.idKey }}
+        - name: PUSH_INSTALLATION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ $.Values.common.pushNotification.secret.name }}
+              key: {{ $.Values.common.pushNotification.secret.keyKey }}
+        {{- end }}
+        {{- if $.Values.common.admin.enabled }}
+        - name: ADMIN_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: {{ $.Values.common.admin.secret.name }}
+              key: {{ $.Values.common.admin.secret.tokenKey }}
+        {{- end }}

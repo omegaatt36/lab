@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "lms.fullname" . }}
+  labels:
+    {{- include "lms.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "lms.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "lms.selectorLabels" . | nindent 8 }}
+    spec:
+    {{- if and .Values.persistence.enabled .Values.persistence.volumes }}
+      volumes:
+      {{- toYaml .Values.persistence.volumes | nindent 6 }}
+    {{ else if eq .Values.persistence.enabled false }}
+      volumes:
+      - name: storage
+        emptyDir: {}
+      - name: music
+        emptyDir: {}
+    {{- end }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.targetPort }}
+        volumeMounts:
+          {{- toYaml .Values.persistence.volumeMounts | nindent 8 }}
+        env:
+        - name: TZ
+          value: "Asia/Taipei"

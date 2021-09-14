@@ -1,0 +1,49 @@
+image:
+  repository: vaultwarden/server
+  tag: latest
+
+common:
+  signups:
+    enabled: false
+  smtp:
+    enabled: true
+    port: 587
+    security: "starttls"
+    secret:
+      name: vaultwarden-smtp
+      hostKey: host
+      fromKey: from
+      usernameKey: username
+      passwordKey: password
+  pushNotification:
+    enabled: true
+    secret:
+      name: vaultwarden-push-notification
+      idKey: id
+      keyKey: key
+  admin:
+    enabled: true
+    secret:
+      name: vaultwarden-admin
+      tokenKey: admin-token
+
+service:
+  type: ClusterIP
+  targetPort: 80
+  port: 80
+  nodePort: 80
+
+persistence:
+  enabled: true
+  existingClaim: vaultwarden-pvc
+
+ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-cloudflare"
+  enabled: true
+  class: "nginx"
+  tls:
+    hostname: kms.omegaatt.com
+    secretName: omegaatt-tls
+  hostname: kms.omegaatt.com
+  path: /

@@ -1,0 +1,7 @@
+apiVersion: v2
+appVersion: 2.11.2
+description: A Helm chart for self hosted Wakapi server
+name: wakapi
+type: application
+version: 2.0.0
+

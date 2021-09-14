@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "s-pdf.fullname" . }}
+  labels:
+    {{- include "s-pdf.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "s-pdf.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "s-pdf.selectorLabels" . | nindent 8 }}
+    spec:
+      # volumes:
+      # - name: data
+      #   persistentVolumeClaim:
+      #     claimName: {{ .Values.persistence.existingClaim }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.targetPort }}
+        # volumeMounts:
+        # - name: data
+        #   mountPath: /data
+        env:
+        - name: LANGS
+          value: {{ $.Values.common.lang | quote }}
+        - name: INSTALL_BOOK_AND_ADVANCED_HTML_OPS
+          value: "false"
+        - name: DOCKER_ENABLE_SECURITY
+          value: "false"

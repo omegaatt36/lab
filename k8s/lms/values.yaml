@@ -1,0 +1,54 @@
+image:
+  repository: lmscommunity/lyrionmusicserver
+  tag: latest
+
+common:
+
+service:
+  type: ClusterIP
+  targetPort: 9000
+  port: 80
+  nodePort: 80
+
+persistence:
+  enabled: true
+  existingClaim: lms-pvc
+
+  volumeMounts:
+    - name: music
+      mountPath: /music
+      subPath: Drive/music
+    - name: storage
+      mountPath: /config
+      subPath: config
+    - name: storage
+      mountPath: /playlist
+      subPath: playlist
+
+  volumes:
+    - name: music
+      flexVolume:
+        driver: "fstab/cifs"
+        fsType: "cifs"
+        secretRef:
+          name: "cifs-secret"
+        options:
+          networkPath: "//192.168.100.100/home"
+          mountOptions: "dir_mode=0755,file_mode=0644,noperm"
+    - name: storage
+      persistentVolumeClaim:
+        claimName: lms-pvc
+
+secret:
+  existingSecret: "cifs-secret"
+
+ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-cloudflare"
+  enabled: true
+  class: "nginx"
+  tls:
+    hostname: lms.omegaatt.com
+    secretName: omegaatt-tls
+  hostname: lms.omegaatt.com
+  path: /

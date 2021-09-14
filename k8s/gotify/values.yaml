@@ -1,0 +1,29 @@
+image:
+  repository: gotify/server
+  tag: latest
+
+common:
+  tz: "Asia/Taipei"
+  username: raiven
+  password: ""
+
+service:
+  type: ClusterIP
+  targetPort: 80
+  port: 80
+  nodePort: 80
+
+persistence:
+  enabled: true
+  existingClaim: gotify-pvc
+
+ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-cloudflare"
+  enabled: true
+  class: "nginx"
+  tls:
+    hostname: gotify.omegaatt.com
+    secretName: omegaatt-tls
+  hostname: gotify.omegaatt.com
+  path: /

@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: omegaatt-tls
+  namespace: kms
+spec:
+  secretName: omegaatt-tls
+  issuerRef:
+    name: letsencrypt-cloudflare
+    kind: ClusterIssuer
+  commonName: omegaatt.com
+  dnsNames:
+    - "omegaatt.com"
+    - "*.omegaatt.com"

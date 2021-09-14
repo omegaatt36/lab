@@ -1,0 +1,39 @@
+image:
+  repository: deluan/navidrome
+  tag: latest
+
+service:
+  type: ClusterIP
+  port: 4533
+  nodePort: 32533
+
+persistence:
+  enabled: true
+  existingClaim: navidrome-pvc
+
+logLevel: info
+
+musicPath: /mnt/nas/drive/music
+
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-cloudflare"
+  tls:
+    hostname: music.omegaatt.com
+    secretName: omegaatt-tls
+  class: "nginx"
+  hostname: music.omegaatt.com
+  path: /
+
+env:
+  - name: ND_BASEURL
+    value: ""
+  - name: ND_SCANSCHEDULE
+    value: 1h
+  - name: ND_SESSIONTIMEOUT
+    value: 72h
+  - name: ND_ENABLETRANSCODINGCONFIG
+    value: "true"
+  - name: ND_SCANNER_EXTRACTOR
+    value: ffmpeg
