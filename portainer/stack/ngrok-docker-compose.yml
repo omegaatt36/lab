@@ -1,0 +1,13 @@
+version: "3.4"
+
+services:
+  ngrok:
+    image: wernight/ngrok:latest
+    environment:
+      - NGROK_AUTH=FILL_ME
+      - NGROK_REGION=ap
+      - NGROK_DEBUG=true
+      - NGROK_PORT=FILL_ME
+    restart: always
+    ports:
+      - 4040:4040
