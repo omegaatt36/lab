@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tcp-services
+  namespace: ingress-nginx
+data:
+  9000: "lms/lms-logitech-media-server:9000"
+  9090: "lms/lms-logitech-media-server:9090"
+  3483: "lms/lms-logitech-media-server:3483"
