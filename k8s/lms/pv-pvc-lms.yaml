@@ -1,0 +1,123 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: lms-pv
+  namespace: lms
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  local:
+    path: /mnt/music
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - k8s-node1
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: lms-pvc
+  namespace: lms
+spec:
+  storageClassName: "" 
+  volumeName: lms-pv
+  accessModes:
+    - ReadWriteOnce           # < Multiple pods can write to storage.  Same value as pv
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1Gi          # < How much data can the pvc claim from pv
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: lms        # < name of the deployment
+#   namespace: lms   # < namespace where place the deployment and pods
+#   labels:
+#     app: lms       # < label for tagging and reference
+# spec:
+#   replicas: 1           # < number of pods to deploy
+#   selector:
+#     matchLabels:
+#       app: lms
+#   strategy:
+#     rollingUpdate:
+#       maxSurge: 0       # < The number of pods that can be created above the desired amount of pods during an update
+#       maxUnavailable: 1 # < The number of pods that can be unavailable during the update process
+#     type: RollingUpdate # < New pods are added gradually, and old pods are terminated gradually
+#   template:
+#     metadata:
+#       labels:
+#         app: lms
+#     spec:
+#       volumes:
+#         - name: lms-data
+#           persistentVolumeClaim:
+#             claimName: lms-pvc 
+#       containers:
+#       - image: lmscommunity/logitechmediaserver # < the name of the docker image we will use
+#         name: lms                      # < name of container
+#         imagePullPolicy: Always             # < always use the latest image when creating container/pod
+#         env:                                # < the environment variables required (see container documentation)
+#           - name: PGID
+#             value: "100" # < group "user"
+#           - name: PUID
+#             value: "1041" # < user "docker"
+#         ports:                              # < the ports required (see container documentation)
+#           - name: http-9000
+#             containerPort: 9000
+#             protocol: TCP
+#           - name: http-9090
+#             containerPort: 9090
+#             protocol: TCP
+#           - name: http-3483
+#             containerPort: 3483 
+#             protocol: TCP
+#           - name: http-3483-udp
+#             containerPort: 3483 
+#             protocol: UDP
+#         volumeMounts:                      # < the volume mount in the container. Look at the relation volumelabel->pvc->pv
+#           - mountPath: /music               # < mount location in the container
+#             name: lms-data                   # < volumelabel configured earlier in the yaml file
+#             subPath: /                  # < subfolder in the nfs share to be mounted
+#           - mountPath: /config               # < mount location in the container
+#             name: lms-data                   # < volumelabel configured earlier in the yaml file
+#             subPath: _config                  # < subfolder in the nfs share to be mounted
+#           - mountPath: /playlist               # < mount location in the container
+#             name: lms-data                   # < volumelabel configured earlier in the yaml file
+#             subPath: _playlist                  # < subfolder in the nfs share to be mounted
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: lms-service    # < name of the service
+#   namespace: lms       # < namespace where place the deployment and pods
+# spec:
+#   type: NodePort
+#   selector:
+#     app: lms           # < reference to the deployment (connects with this deployment)
+#   ports:
+#     - name: http-9000
+#       protocol: TCP
+#       port: 9000
+#       nodePort: 30090
+#     - name: http-9090
+#       protocol: TCP
+#       port: 9090
+#       nodePort: 30099
+#     - name: http-3483
+#       protocol: TCP
+#       port: 3483
+#       nodePort: 30483
+#     - name: http-3483-udp
+#       protocol: UDP
+#       port: 3483
+#       nodePort: 30483
