@@ -10,8 +10,9 @@ spec:
   accessModes:
     - ReadWriteOnce
   persistentVolumeReclaimPolicy: Retain
-  local:
-    path: /mnt/music
+  nfs:
+    server: 192.168.50.100
+    path: "/music"
   nodeAffinity:
     required:
       nodeSelectorTerms:

@@ -1,0 +1,172 @@
+## Global Docker image parameters
+##
+# global:
+#   storageClass: myStorageClass
+
+## Syphr Logitech Media Server image
+## ref: https://hub.docker.com/r/syphr/logitechmediaserver/tags/
+##
+image:
+  repository: ghcr.io/linuxserver/heimdall
+  ## Overrides the image tag whose default is the chart appVersion.
+  ##
+  tag: "latest"
+  ## Specify a imagePullPolicy
+  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
+  ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
+  ##
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+## String to override the chart name
+##
+nameOverride: ""
+
+## String to override the full name normally derived from the chart and release names
+##
+fullnameOverride: ""
+service:
+  type: ClusterIP
+  port: 80
+
+## Ingress parameters
+##
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  hosts:
+  - host: k8s-heimdall.local
+    paths: 
+      - path: /
+        pathType: Prefix
+      
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+## Enable persistence using Persistent Volume Claims
+## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
+##
+persistence:
+  ## If true, use a Persistent Volume Claim, If false, use emptyDir
+  ##
+  enabled: true
+  # Enable persistence using an existing PVC
+  existingClaim: heimdall-pvc
+  selector: {}
+  ## Persistent Volume Storage Class
+  ## If defined, storageClassName: <storageClass>
+  ## If set to "-", storageClassName: "", which disables dynamic provisioning
+  ## If undefined (the default) or set to null, no storageClassName spec is
+  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
+  ##   GKE, AWS & OpenStack)
+  ##
+  # storageClass: "-"
+  ## Persistent Volume Claim annotations
+  ##
+  annotations:
+  ## Persistent Volume Access Mode
+  ##
+  accessModes:
+    - ReadWriteMany
+  ## Persistent Volume size
+  ##
+  size: 1Gi
+
+## extraVolumes and extraVolumeMounts allows you to mount other volumes
+## Example Use Cases:
+##  mount music files
+##  mount playlists
+# extraVolumes:
+# - name: collection
+# - name: playlists
+# extraVolumeMounts:
+# - name: collection
+#   mountPath: /mnt/collection
+#   readOnly: true
+# - name: playlists
+#   mountPath: /mnt/playlists
+#   readOnly: true
+
+## Configure extra options for liveness, readiness and startup probes
+## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
+##
+livenessProbe:
+  enabled: true
+  path: /
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 5
+  successThreshold: 1
+readinessProbe:
+  enabled: true
+  path: /
+  initialDelaySeconds: 0
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+  successThreshold: 1
+startupProbe:
+  enabled: true
+  path: /
+  initialDelaySeconds: 0
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 30
+  successThreshold: 1
+
+  ## Custom Liveness probe
+  ##
+  customLivenessProbe: {}
+
+  ## Custom Readiness probe
+  ##
+  customReadinessProbe: {}
+
+  ## Custom Startup probe
+  ##
+  customStartupProbe: {}
