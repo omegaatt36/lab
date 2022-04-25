@@ -1,0 +1,191 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: syncthing-pv
+spec:
+  capacity:
+    storage: 10Gi
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  claimRef:
+    name: syncthing-pv-claim
+    namespace: default
+  local:
+    path: /home/pv/syncthing-data
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - k8s-node
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: syncthing-pv-claim
+  labels:
+    app: syncthing
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: syncthing
+  labels:
+    app: syncthing
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: syncthing
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: syncthing
+    spec:
+      nodeSelector: {}
+      containers:
+      - image: syncthing/syncthing:1.18
+        name: syncthing
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 8384
+          name: syncthing
+          protocol: TCP
+        - containerPort: 22000
+          protocol: TCP
+          name: to-listen
+        - containerPort: 22000
+          protocol: UDP
+          name: to-discover
+        volumeMounts:
+        - name: syncthing-persistent-storage
+          mountPath: /var/syncthing
+        - name: drive
+          mountPath: /data
+      volumes:
+      - name: syncthing-persistent-storage
+        persistentVolumeClaim:
+          claimName: syncthing-pv-claim
+      - name: drive
+        flexVolume:
+          driver: "fstab/cifs"
+          fsType: "cifs"
+          secretRef:
+            name: "cifs-secret"
+          options:
+            networkPath: "//192.168.100.100/drive"
+            mountOptions: "dir_mode=0755,file_mode=0644,noperm"
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: syncthing
+  namespace: default
+  annotations: 
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: k8s-syncthing.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: syncthing-service
+            port:
+              number: 8384
+  # - host: k8s-syncthing.local
+  #   http:
+  #     paths:
+  #     - path: /
+  #       pathType: Prefix
+  #       backend:
+  #         service:
+  #           name: syncthing-service
+  #           port:
+  #             number: 22000
+  # - host: k8s-syncthing.local
+  #   http:
+  #     paths:
+  #     - path: /
+  #       pathType: Prefix
+  #       backend:
+  #         service:
+  #           name: syncthing-service
+  #           port:
+  #             number: 22000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: syncthing-service
+  labels:
+    app: syncthing
+spec:
+  ports:
+    - name: http
+      port: 8384
+      targetPort: 8384
+      protocol: TCP
+    - protocol: TCP
+      port: 22000
+      targetPort: 22000
+      name: to-listen
+    - protocol: UDP
+      port: 22000
+      targetPort: 22000
+      name: to-discover
+  selector:
+    app: syncthing
+  type: ClusterIP
+# if we use NodePort here so custom port, such as 22000, 8383 will be exposed through 32000 and 32080 at instance ip
+# we cannot use cluster ip only here because it will not expose the ports https://stackoverflow.com/questions/41509439/whats-the-difference-between-clusterip-nodeport-and-loadbalancer-service-types
+# we need to enable the ports in firewall to support syncthing if use cluster ip
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: syncthing-service
+#   labels:
+#     app: syncthing
+# spec:
+#   ports:
+#     - name: http
+#       port: 32080
+#       nodePort: 32080
+#       targetPort: 8384
+#       protocol: TCP
+#     - protocol: TCP
+#       port: 32000
+#       targetPort: 22000
+#       nodePort: 22000
+#       name: to-listen
+#     - protocol: UDP
+#       port: 32000
+#       nodePort: 32000
+#       targetPort: 22000
+#       name: to-discover
+#   selector:
+#     app: syncthing
+#   type: NodePort
+# # if we use NodePort here so custom port, such as 22000, 8383 will be exposed through 32000 and 32080 at instance ip
+# # we cannot use cluster ip only here because it will not expose the ports https://stackoverflow.com/questions/41509439/whats-the-difference-between-clusterip-nodeport-and-loadbalancer-service-types
+# # we need to enable the ports in firewall to support syncthing if use cluster ip
