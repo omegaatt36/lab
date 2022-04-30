@@ -16,3 +16,8 @@ prometheus helm deploy
     ```bash
     helm install prometheus prometheus-community/prometheus -f values.yaml
     ```
+
+# exporter
+
+- [prometheus-pve-exporte](https://github.com/znerol/prometheus-pve-exporter)
+- [pwrstat-exporter](https://github.com/kerwenwwer/pwrstat-exporter)

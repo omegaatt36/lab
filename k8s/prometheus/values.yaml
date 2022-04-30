@@ -30,7 +30,7 @@ serviceAccounts:
 alertmanager:
   ## If false, alertmanager will not be installed
   ##
-  enabled: true
+  enabled: false
 
   ## Use a ClusterRole (and ClusterRoleBinding)
   ## - If set to false - we define a Role and RoleBinding in the defined namespaces ONLY
@@ -1806,6 +1806,11 @@ serverFiles:
       - job_name: 'pwrstat-exporter'
         static_configs:
           - targets: ['192.168.100.99:8088']
+
+      - job_name: 'prometheus-pve-exporter'
+        metrics_path: /pve
+        static_configs:
+          - targets: ['192.168.100.99:9221']
 # adds additional scrape configs to prometheus.yml
 # must be a string so you have to add a | after extraScrapeConfigs:
 # example adds prometheus-blackbox-exporter scrape config
