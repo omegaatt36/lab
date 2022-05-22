@@ -1811,6 +1811,14 @@ serverFiles:
         metrics_path: /pve
         static_configs:
           - targets: ['192.168.100.99:9221']
+
+      - job_name: 'raspberry-pi-ubuntu-server'
+        static_configs:
+          - targets: ['192.168.100.11:9100']
+          
+      - job_name: 'mikrotik-exporter'
+        static_configs:
+          - targets: ['mikrotik-exporter-service:9436']
 # adds additional scrape configs to prometheus.yml
 # must be a string so you have to add a | after extraScrapeConfigs:
 # example adds prometheus-blackbox-exporter scrape config
