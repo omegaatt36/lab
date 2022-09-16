@@ -1,0 +1,22 @@
+version: '3'
+volumes:
+  lms-config:
+  lms-music:
+  lms-playlist:
+
+services:
+  lms:
+    container_name: lms
+    image: lmscommunity/logitechmediaserver
+    volumes:
+      - lms-config:/config:rw
+      - lms-music:/music:ro
+      - lms-playlist:/playlist:rw
+      - /etc/localtime:/etc/localtime:ro
+      - /etc/timezone:/etc/timezone:ro
+    ports:
+      - 9000:9000/tcp
+      - 9090:9090/tcp
+      - 3483:3483/tcp
+      # - 3483:3483/udp
+    restart: always
