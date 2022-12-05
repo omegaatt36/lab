@@ -1,6 +1,6 @@
 dependencies:
 - name: common
-  repository: https://charts.bitnami.com/bitnami
-  version: 1.4.2
-digest: sha256:c5178c814a7ef464bc400b186cda00bfaa8605fa663218473c5dc46f61e6a2d2
-generated: "2021-12-08T16:34:22.179647779+08:00"
+  repository: http://bjw-s.github.io/helm-charts/
+  version: 0.1.0
+digest: sha256:8939a61c61d1303c77925f8b803dccfb29b4de2a2c0a2937c80c37bfd31fd723
+generated: "2022-09-06T14:54:46.196524514Z"

@@ -1,172 +1,155 @@
-## Global Docker image parameters
-##
-# global:
-#   storageClass: myStorageClass
+#
+# IMPORTANT NOTE
+#
+# This chart inherits from our common library chart. You can check the default values/options here:
+# https://github.com/bjw-s/helm-charts/tree/main/charts/library/common/values.yaml
+#
 
-## Syphr Logitech Media Server image
-## ref: https://hub.docker.com/r/syphr/logitechmediaserver/tags/
-##
 image:
-  repository: ghcr.io/linuxserver/heimdall
-  ## Overrides the image tag whose default is the chart appVersion.
-  ##
-  tag: "latest"
-  ## Specify a imagePullPolicy
-  ## Defaults to 'Always' if image tag is 'latest', else set to 'IfNotPresent'
-  ## ref: http://kubernetes.io/docs/user-guide/images/#pre-pulling-images
-  ##
+  # -- image repository
+  repository: linuxserver/heimdall
+  # -- image tag
+  tag: latest
+  # -- image pull policy
   pullPolicy: IfNotPresent
 
-imagePullSecrets: []
+# -- environment variables. See more environment variables in the [heimdall documentation](https://github.com/linuxserver/docker-heimdall#parameters).
+# @default -- See below
+env:
+  # -- Set the container timezone
+  TZ: "Asia/Taipei"
+  # -- Set the container user id
+  PUID: "1000"
+  # -- Set the container group id
+  PGID: "1000"
 
-## String to override the chart name
-##
-nameOverride: ""
-
-## String to override the full name normally derived from the chart and release names
-##
-fullnameOverride: ""
+# -- Configure the services for the chart here.
+# Additional services can be added by adding a dictionary key similar to the 'main' service.
+# @default -- See below
 service:
-  type: ClusterIP
-  port: 80
+  main:
+    # -- Enables or disables the service
+    enabled: true
 
-## Ingress parameters
-##
+    # -- Make this the primary service (used in probes, notes, etc...).
+    # If there is more than 1 service, make sure that only 1 service is marked as primary.
+    primary: true
+
+    # -- Override the name suffix that is used for this service
+    nameOverride:
+
+    # -- Set the service type
+    type: NodePort
+
+    # -- Specify the externalTrafficPolicy for the service. Options: Cluster, Local
+    # -- [[ref](https://kubernetes.io/docs/tutorials/services/source-ip/)]
+    externalTrafficPolicy:
+
+    # -- Specify the ip policy. Options: SingleStack, PreferDualStack, RequireDualStack
+    ipFamilyPolicy:
+    # -- The ip families that should be used. Options: IPv4, IPv6
+    ipFamilies: []
+
+    # -- Provide additional annotations which may be required.
+    annotations: {}
+
+    # -- Provide additional labels which may be required.
+    labels: {}
+
+    # -- Configure the Service port information here.
+    # Additional ports can be added by adding a dictionary key similar to the 'http' service.
+    # @default -- See below
+    ports:
+      http:
+        # -- Enables or disables the port
+        enabled: true
+
+        # -- Make this the primary port (used in probes, notes, etc...)
+        # If there is more than 1 service, make sure that only 1 port is marked as primary.
+        primary: true
+
+        # -- The port number
+        port: 80
+
+        # -- Port protocol.
+        # Support values are `HTTP`, `HTTPS`, `TCP` and `UDP`.
+        # HTTPS and HTTPS spawn a TCP service and get used for internal URL and name generation
+        protocol: HTTP
+
+        # -- Specify a service targetPort if you wish to differ the service port from the application port.
+        # If `targetPort` is specified, this port number is used in the container definition instead of
+        # the `port` value. Therefore named ports are not supported for this field.
+        targetPort:
+
+        # -- Specify the nodePort value for the LoadBalancer and NodePort service types.
+        # [[ref]](https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport)
+        nodePort: 30080
+
+        # -- Allow adding additional match labels
+        extraSelectorLabels: {}
 ingress:
-  enabled: true
-  annotations:
-    kubernetes.io/ingress.class: nginx
-  hosts:
-  - host: k8s-heimdall.local
-    paths: 
-      - path: /
-        pathType: Prefix
-      
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  # -- Enable and configure ingress settings for the chart under this key.
+  # @default -- See values.yaml
+  main:
+    enabled: false
 
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: false
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
-
-podAnnotations: {}
-
-podSecurityContext: {}
-  # fsGroup: 2000
-
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
-
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
-
-nodeSelector: {}
-
-tolerations: []
-
-affinity: {}
-
-## Enable persistence using Persistent Volume Claims
-## ref: http://kubernetes.io/docs/user-guide/persistent-volumes/
-##
+# -- Configure persistence settings for the chart under this key.
+# @default -- See values.yaml
 persistence:
-  ## If true, use a Persistent Volume Claim, If false, use emptyDir
-  ##
-  enabled: true
-  # Enable persistence using an existing PVC
-  existingClaim: heimdall-pvc
-  selector: {}
-  ## Persistent Volume Storage Class
-  ## If defined, storageClassName: <storageClass>
-  ## If set to "-", storageClassName: "", which disables dynamic provisioning
-  ## If undefined (the default) or set to null, no storageClassName spec is
-  ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-  ##   GKE, AWS & OpenStack)
-  ##
-  # storageClass: "-"
-  ## Persistent Volume Claim annotations
-  ##
-  annotations:
-  ## Persistent Volume Access Mode
-  ##
-  accessModes:
-    - ReadWriteMany
-  ## Persistent Volume size
-  ##
-  size: 1Gi
+  # -- Default persistence for configuration files.
+  # @default -- See below
+  config:
+    # -- Enables or disables the persistence item
+    enabled: true
 
-## extraVolumes and extraVolumeMounts allows you to mount other volumes
-## Example Use Cases:
-##  mount music files
-##  mount playlists
-# extraVolumes:
-# - name: collection
-# - name: playlists
-# extraVolumeMounts:
-# - name: collection
-#   mountPath: /mnt/collection
-#   readOnly: true
-# - name: playlists
-#   mountPath: /mnt/playlists
-#   readOnly: true
+    # -- Sets the persistence type
+    # Valid options are pvc, emptyDir, hostPath, secret, configMap or custom
+    type: pvc
 
-## Configure extra options for liveness, readiness and startup probes
-## ref: https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/#configure-probes
-##
-livenessProbe:
-  enabled: true
-  path: /
-  initialDelaySeconds: 0
-  periodSeconds: 10
-  timeoutSeconds: 5
-  failureThreshold: 5
-  successThreshold: 1
-readinessProbe:
-  enabled: true
-  path: /
-  initialDelaySeconds: 0
-  periodSeconds: 5
-  timeoutSeconds: 3
-  failureThreshold: 3
-  successThreshold: 1
-startupProbe:
-  enabled: true
-  path: /
-  initialDelaySeconds: 0
-  periodSeconds: 10
-  timeoutSeconds: 3
-  failureThreshold: 30
-  successThreshold: 1
+    # -- Where to mount the volume in the main container.
+    # Defaults to `/<name_of_the_volume>`,
+    # setting to '-' creates the volume but disables the volumeMount.
+    mountPath:  # /config
+    # -- Specify if the volume should be mounted read-only.
+    readOnly: false
+    # -- Override the name suffix that is used for this volume.
+    nameOverride:
 
-  ## Custom Liveness probe
-  ##
-  customLivenessProbe: {}
+    # -- Storage Class for the config volume.
+    # If set to `-`, dynamic provisioning is disabled.
+    # If set to something else, the given storageClass is used.
+    # If undefined (the default) or set to null, no storageClassName spec is set, choosing the default provisioner.
+    storageClass: ""
 
-  ## Custom Readiness probe
-  ##
-  customReadinessProbe: {}
+    # -- If you want to reuse an existing claim, the name of the existing PVC can be passed here.
+    existingClaim: heimdall-pvc
 
-  ## Custom Startup probe
-  ##
-  customStartupProbe: {}
+    # -- Used in conjunction with `existingClaim`. Specifies a sub-path inside the referenced volume instead of its root
+    subPath:  # some-subpath
+
+    # -- AccessMode for the persistent volume.
+    # Make sure to select an access mode that is supported by your storage provider!
+    # [[ref]](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#access-modes)
+    accessMode: ReadWriteMany
+
+    # -- The amount of storage that is requested for the persistent volume.
+    size: 1Gi
+
+    # -- Set to true to retain the PVC upon `helm uninstall`
+    retain: false
+
+  # -- Create an emptyDir volume to share between all containers
+  # [[ref]]https://kubernetes.io/docs/concepts/storage/volumes/#emptydir)
+  # @default -- See below
+  shared:
+    enabled: false
+    type: emptyDir
+    mountPath: /shared
+
+    # -- Set the medium to "Memory" to mount a tmpfs (RAM-backed filesystem) instead
+    # of the storage medium that backs the node.
+    medium:  # Memory
+
+    # -- If the `SizeMemoryBackedVolumes` feature gate is enabled, you can
+    # specify a size for memory backed volumes.
+    sizeLimit:  # 1Gi
