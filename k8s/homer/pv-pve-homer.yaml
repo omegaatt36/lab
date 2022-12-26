@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: homer-pv   # < name of the persisant volume ("pv") in kubenetes
+  namespace: homer     # < namespace where place the pv
+spec:
+  storageClassName: ""
+  capacity:
+    storage: 1Gi          # < max. size we reserve for the pv
+  accessModes:
+    - ReadWriteMany       # < Multiple pods can write to storage 
+  persistentVolumeReclaimPolicy: Retain   # < The persistant volume can reclaimed 
+  local:
+    path: /home/raiven/homer
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/hostname
+          operator: In
+          values:
+          - cloud
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: homer-pvc        # < name of the persistant volume claim ("pvc'")
+  namespace: homer       # < namespace where place the pvc
+
+spec:
+  storageClassName: "" 
+  volumeName: homer-pv # < the pv it will "claim" to storage. Created in the previous yaml.
+  accessModes:
+    - ReadWriteMany           # < Multiple pods can write to storage.  Same value as pv
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 1Gi          # < How much data can the pvc claim from pv
