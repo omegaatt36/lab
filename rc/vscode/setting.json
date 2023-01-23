@@ -1,0 +1,49 @@
+{
+    "git.mergeEditor": true,
+
+    "editor.formatOnType": true,
+    "editor.fontSize": 16,
+    "editor.rulers": [80, 120],
+    "editor.fontFamily": "Fira Code",
+    "editor.fontLigatures": true,
+    "editor.foldingStrategy": "indentation",
+    "editor.snippetSuggestions": "top",
+
+    "workbench.iconTheme": "vscode-icons",
+
+    "terminal.integrated.fontFamily": "MesloLGS NF",
+    "terminal.integrated.fontSize": 12,
+    "terminal.integrated.profiles.linux": {
+        "zsh": {
+            "path": "zsh"
+        }
+    },
+
+    "json.maxItemsComputed": 50000,
+
+    "// todo-tree_extension":"https://marketplace.visualstudio.com/items?itemName=Gruntfuggly.todo-tree",
+    "todo-tree.regex.regex": "(//|#|<!--|;|/\\*|^|^\\s*(-|\\d+.))\\s*($TAGS)",
+    "todo-tree.general.tags": [
+        "BUG",
+        "HACK",
+        "FIXME",
+        "TODO",
+        "XXX",
+        "[ ]",
+        "[x]"
+    ],
+
+    "go.formatTool": "goimports",
+    "go.toolsManagement.autoUpdate": true,
+    "go.useLanguageServer": true,
+    
+    "// cSpell_extension":"https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker",
+    "cSpell.ignoreWords": [
+        "gobe",
+        "appmodule",
+        "gorm",
+        "goimports",
+        "gormigrate",
+        "Wrapf"
+    ]
+}
