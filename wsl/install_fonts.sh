@@ -3,24 +3,24 @@
 declare target="linux"
 declare repo="ryanoasis/nerd-fonts"
 declare -a fonts=(
-  BitstreamVeraSansMono
-  CodeNewRoman
-  DroidSansMono
+  # BitstreamVeraSansMono
+  # CodeNewRoman
+  # DroidSansMono
   FiraCode
   FiraMono
   Go-Mono
   Hack
-  Hermit
-  JetBrainsMono
+  # Hermit
+  # JetBrainsMono
   Meslo
-  Noto
-  Overpass
-  ProggyClean
-  RobotoMono
-  SourceCodePro
-  SpaceMono
-  Ubuntu
-  UbuntuMono
+  # Noto
+  # Overpass
+  # ProggyClean
+  # RobotoMono
+  # SourceCodePro
+  # SpaceMono
+  # Ubuntu
+  # UbuntuMono
 )
 
 
