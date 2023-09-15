@@ -19,13 +19,11 @@ declare -a fonts=(
   # RobotoMono
   # SourceCodePro
   # SpaceMono
-  # Ubuntu
-  # UbuntuMono
+  Ubuntu
+  UbuntuMono
 )
 
-
-ARGS=`getopt -o p --long windows -- "$@"`
-if [ $? -ne 0 ]; then
+if ! ARGS=$(getopt -o p --long windows -- "$@"); then
   echo "getopt failed: " $ARGS
   exit 1
 fi
@@ -46,11 +44,10 @@ case "$1" in
 esac
 done
 
-
 get_latest_release() {
-  echo $(curl --silent "https://api.github.com/repos/$@/releases/latest" |
+  curl --silent "https://api.github.com/repos/$1/releases/latest" |
     grep '"tag_name":' |
-    sed -E 's/.*"([^"]+)".*/\1/')
+    sed -E 's/.*"([^"]+)".*/\1/'
 }
 
 function install_linux_fonts() {
@@ -59,7 +56,8 @@ function install_linux_fonts() {
   if [[ ! -d "$fonts_dir" ]]; then
     mkdir -p "$fonts_dir"
   fi
-  mv $@/*.ttf $fonts_dir/
+
+  find "$@" -name "*.ttf" -exec mv {} "$fonts_dir" \;
 
   # fc-cache -fv
 }
@@ -67,15 +65,17 @@ function install_linux_fonts() {
 # Install font for the current user. It'll appear in "Font settings".
 function install_windows_fonts() {
   local dst_dir
-  dst_dir=$(wslpath $(cmd.exe /c "echo %LOCALAPPDATA%\Microsoft\\Windows\\Fonts" 2>/dev/null | sed 's/\r$//'))
+  dst_dir=$(wslpath "$(cmd.exe /c "echo %LOCALAPPDATA%\Microsoft\\Windows\\Fonts" 2>/dev/null | sed 's/\r$//')")
   mkdir -p "$dst_dir"
   local src
   for src in "$@"; do
-    local file=$(basename "$src")
+    local file
+    file=$(basename "$src")
+
     test -f "$dst_dir/$file" || cp -f "$src" "$dst_dir/"
     local win_path
     win_path=$(wslpath -w "$dst_dir/$file")
-    echo $win_path
+    echo "$win_path"
     reg.exe add                                                      \
       "HKCU\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Fonts" \
       /v "${file%.*} (TrueType)"  /t REG_SZ /d "$win_path" /f 2>/dev/null
@@ -89,7 +89,7 @@ function main() {
   local tmp_dir
   tmp_dir="$(mktemp -d)"
 
-  trap "rm -rf ${tmp_dir@Q}" INT TERM EXIT
+  trap 'rm -rf ${tmp_dir@Q}' INT TERM EXIT
 
   for font in "${fonts[@]}"; do
     zip_file="${font}.zip"
@@ -104,14 +104,16 @@ function main() {
 
   if [ "$target" = "linux" ]
   then
-    install_linux_fonts $tmp_dir
+    install_linux_fonts "$tmp_dir"
   elif [ "$target" = "windows" ]
   then
-    install_windows_fonts $tmp_dir/*.ttf
+    install_windows_fonts "$tmp_dir/*.ttf"
   fi
 }
 
-main 
+set -xe
+
+main
 
 echo -e '\033[0;32m'
 echo 'Fonts successfully installed.'
