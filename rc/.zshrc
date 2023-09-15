@@ -19,19 +19,16 @@ bindkey "^[[F" end-of-line
 export ZPLUG_HOME=~/.zplug
 
 # go dev
-if command -v go &> /dev/null
-then
-  export GOPATH=$HOME/go
-  export PATH=$PATH:$GOPATH/bin
-  export PATH=$PATH:/usr/local/go/bin
-  export PATH=$PATH:/usr/local/node/bin
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+
+# podman dev
+if command -v podman &> /dev/null
+  source <(podman completion zsh)
 fi
 
 # npm dev
-if command -v npm &> /dev/null
-then
-  export PATH=~/.npm-global/bin:$PATH
-fi
+export PATH="${HOME}/.npm-global/bin":"${PATH}"
 
 # kubernetes dev
 if command -v kubectl &> /dev/null
@@ -40,3 +37,14 @@ then
   source <(kubectl completion zsh)
   alias k=kubectl
 fi
+
+# rust dev
+if command -v cargo &> /dev/null
+  source $HOME/.cargo/env
+  # alias cat=batcat
+  # alias ls=eza
+fi
+
+# leetgo dev
+export LEETCODE_SESSION=
+export LEETCODE_CSRFTOKEN=
