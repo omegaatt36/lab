@@ -6,7 +6,7 @@ export ZSH="${HOME}/.oh-my-zsh"
 
 POWERLEVEL9K_MODE='nerdfont-complete'
 ZSH_THEME="powerlevel10k/powerlevel10k"
-plugins=(git golang zsh-autosuggestions docker history-substring-search kubectl zsh-docker-aliases)
+plugins=(git golang zsh-autosuggestions docker history-substring-search kubectl)
 source $ZSH/oh-my-zsh.sh
 
 # bind home & end key
@@ -18,33 +18,29 @@ bindkey "^[[F" end-of-line
 
 export ZPLUG_HOME=~/.zplug
 
-# go dev
+# tmux
+export TMUX_PLUGIN_MANAGER_PATH=${HOME}/.tmux/plugins/tpm/
+
+# golang
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
 
-# podman dev
-if command -v podman &> /dev/null
-  source <(podman completion zsh)
-fi
+# podman
+# source <(podman completion zsh)
 
-# npm dev
+# npm
 export PATH="${HOME}/.npm-global/bin":"${PATH}"
 
-# kubernetes dev
-if command -v kubectl &> /dev/null
-then
-  export KUBECONFIG=$HOME/.kube/config
-  source <(kubectl completion zsh)
-  alias k=kubectl
-fi
+# kubernetes
+# export KUBECONFIG=$HOME/.kube/config
+# source <(kubectl completion zsh)
+# alias k=kubectl
 
-# rust dev
-if command -v cargo &> /dev/null
-  source $HOME/.cargo/env
-  # alias cat=batcat
-  # alias ls=eza
-fi
+# rust
+# source $HOME/.cargo/env
+# alias cat=bat
+# alias ls=eza
 
-# leetgo dev
+# leetgo
 export LEETCODE_SESSION=
 export LEETCODE_CSRFTOKEN=
