@@ -46,16 +46,17 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: NodePort
+  type: ClusterIP
   port: 3001
   nodePort: 30301
   annotations: {}
 
 ingress:
-  enabled: false
-  className: ""
+  enabled: true
+  className: "nginx"
   extraLabels: {}
   annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-issuer
     nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
     nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
     nginx.ingress.kubernetes.io/server-snippets: |
@@ -79,7 +80,9 @@ ingress:
           pathType: ImplementationSpecific
 
   tls:
-    []
+    - hosts:
+      - kuma.omegaatt.com
+      secretName: kuma-omegaatt-com-tls
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
