@@ -1,0 +1,29 @@
+image:
+  repository: couchdb
+  tag: 3.3.2
+
+service:
+  type: ClusterIP
+  port: 5984
+  nodePort: 35984
+  targetPort: 5984
+
+persistence:
+  enabled: true
+  existingClaim: couchdb-pvc
+
+ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-issuer
+  enabled: true
+  class: "nginx"
+  tls:
+    secretName: couch-omegaatt-com-tls
+  hostname: couch.omegaatt.com
+  path: /
+
+env:
+  - name: COUCHDB_USER
+    value: admin
+  - name: COUCHDB_PASSWORD
+    value: CHANGE_ME
