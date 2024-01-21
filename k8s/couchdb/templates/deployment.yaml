@@ -24,7 +24,7 @@ spec:
           containerPort: 4533
         volumeMounts:
         - name: data
-          mountPath: /data
+          mountPath: /opt/couchdb/data
         {{ if .Values.env }}
         env:
         {{- toYaml .Values.env | nindent 8 }}
