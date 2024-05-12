@@ -4,6 +4,9 @@ metadata:
   name: {{ include "gitea.fullname" . }}-http
   labels:
     {{- include "gitea.labels" . | nindent 4 }}
+    {{- if .Values.service.http.labels }}
+    {{- toYaml .Values.service.http.labels  | nindent 4 }}
+    {{- end }}
   annotations:
     {{- toYaml .Values.service.http.annotations | nindent 4 }}
 spec:
@@ -21,6 +24,13 @@ spec:
   externalIPs:
     {{- toYaml .Values.service.http.externalIPs | nindent 4 }}
   {{- end }}
+  {{- if .Values.service.http.ipFamilyPolicy }}
+  ipFamilyPolicy: {{ .Values.service.http.ipFamilyPolicy }}
+  {{- end }}
+  {{- with .Values.service.http.ipFamilies }}
+  ipFamilies:
+  {{- toYaml . | nindent 4 }}
+  {{- end -}}
   {{- if .Values.service.http.externalTrafficPolicy }}
   externalTrafficPolicy: {{ .Values.service.http.externalTrafficPolicy }}
   {{- end }}
