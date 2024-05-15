@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "gotify.fullname" . }}
+  labels:
+    {{- include "gotify.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "gotify.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "gotify.selectorLabels" . | nindent 8 }}
+    spec:
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.existingClaim }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.targetPort }}
+        volumeMounts:
+        - name: data
+          mountPath: /app/data
+        env:
+        - name: TZ
+          value: {{ $.Values.common.tz | quote }}
+        - name: GOTIFY_DEFAULTUSER_NAME
+          value: {{ $.Values.common.username | quote }}
+        - name: GOTIFY_DEFAULTUSER_PASS
+          value: {{ $.Values.common.password | quote }}
