@@ -4,8 +4,8 @@ image:
 
 common:
   tz: "Asia/Taipei"
-  username: admin
-  password: admin
+  username: raiven
+  password: aabb54cj/6
 
 service:
   type: ClusterIP
@@ -19,11 +19,11 @@ persistence:
 
 ingress:
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-issuer
+    cert-manager.io/cluster-issuer: "letsencrypt-cloudflare"
   enabled: true
   class: "nginx"
   tls:
     hostname: gotify.omegaatt.com
-    secretName: gotify-omegaatt-com-tls
+    secretName: omegaatt-tls
   hostname: gotify.omegaatt.com
   path: /

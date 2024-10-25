@@ -16,14 +16,13 @@ logLevel: info
 musicPath: /mnt/nas/drive/music
 
 ingress:
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-issuer
   enabled: true
-  class: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-cloudflare"
   tls:
-    - hosts:
-      - music.omegaatt.com
-      secretName: music-omegaatt-com-tls
+    hostname: music.omegaatt.com
+    secretName: omegaatt-tls
+  class: "nginx"
   hostname: music.omegaatt.com
   path: /
 

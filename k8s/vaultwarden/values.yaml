@@ -39,11 +39,11 @@ persistence:
 
 ingress:
   annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-issuer
+    cert-manager.io/cluster-issuer: "letsencrypt-cloudflare"
   enabled: true
   class: "nginx"
   tls:
     hostname: kms.omegaatt.com
-    secretName: kms-omegaatt-com-tls
+    secretName: omegaatt-tls
   hostname: kms.omegaatt.com
   path: /
