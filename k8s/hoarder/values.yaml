@@ -4,7 +4,7 @@ controllers:
       web:
         image:
           repository: ghcr.io/hoarder-app/hoarder
-          tag: 0.18.0
+          tag: 0.21.0
         env:
           HOARDER_VERSION: release
           MEILI_ADDR: http://hoarder-meilisearch:7700
@@ -29,12 +29,13 @@ controllers:
           - --remote-debugging-address=0.0.0.0
           - --remote-debugging-port=9222
           - --hide-scrollbars
+          - --enable-features=ConversionMeasurement,AttributionReportingCrossAppWeb
   meilisearch:
     containers:
       meilisearch:
         image:
           repository: getmeili/meilisearch
-          tag: v1.6
+          tag: v1.11.1
         env:
           MEILI_NO_ANALYTICS: true
 service:
