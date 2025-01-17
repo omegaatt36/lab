@@ -10,21 +10,21 @@ common:
     port: 587
     security: "starttls"
     secret:
-      name: smtp
+      name: vaultwarden-smtp
       hostKey: host
-      formKey: from
+      fromKey: from
       usernameKey: username
       passwordKey: password
   pushNotification:
     enabled: true
     secret:
-      name: push-notification
+      name: vaultwarden-push-notification
       idKey: id
       keyKey: key
   admin:
     enabled: true
     secret:
-      name: vaultwarden
+      name: vaultwarden-admin
       tokenKey: admin-token
 
 service:

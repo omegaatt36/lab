@@ -48,7 +48,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: {{ $.Values.common.smtp.secret.name }}
-              key: {{ $.Values.common.smtp.secret.formKey }}
+              key: {{ $.Values.common.smtp.secret.fromKey }}
         - name: SMTP_USERNAME
           valueFrom:
             secretKeyRef:
