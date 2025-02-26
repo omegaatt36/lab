@@ -3,7 +3,7 @@ FROM debian:bookworm
 ARG USERNAME=raiven_kao
 
 RUN apt update && apt install -y \
-    git vim curl zsh wget unzip gpg \
+    git vim curl zsh wget unzip gpg make \
     fd-find bat
 
 RUN <<EOF

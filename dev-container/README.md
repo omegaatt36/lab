@@ -14,10 +14,9 @@ docker run --rm -it \
   --hostname dev-container-python \
   -v $(pwd):/home/$(whoami)/app \
   -v ${HOME}/.zsh_other_env:/home/$(whoami)/.zsh_other_env \
-  -v ${HOME}/.npmrc:/home/$(whoami)/.npmrc \
   -v ${HOME}/.wakatime.cfg:/home/$(whoami)/.wakatime.cfg \
   --name dev-python-$(basename $(pwd)) \
-  python-dev:latest
+  omegaatt36/python-dev:latest
 ```
 
 ### Node.js
@@ -31,7 +30,20 @@ docker run --rm -it \
   -v ${HOME}/.npmrc:/home/$(whoami)/.npmrc \
   -v ${HOME}/.wakatime.cfg:/home/$(whoami)/.wakatime.cfg \
   --name dev-node-$(basename $(pwd)) \
-  node-dev:latest
+  omegaatt36/node-dev:latest
+```
+
+## Java
+
+```bash
+docker run --rm -it \
+  -w /home/$(whoami)/app \
+  --hostname dev-container-java \
+  -v $(pwd):/home/$(whoami)/app \
+  -v ${HOME}/.zsh_other_env:/home/$(whoami)/.zsh_other_env \
+  -v ${HOME}/.wakatime.cfg:/home/$(whoami)/.wakatime.cfg \
+  --name dev-java-$(basename $(pwd)) \
+  omegaatt36/java-dev:latest
 ```
 
 ## Explanation of Docker Run Arguments:
