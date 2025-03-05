@@ -35,3 +35,5 @@ env:
     value: 72h
   - name: ND_ENABLETRANSCODINGCONFIG
     value: "true"
+  - name: ND_SCANNER_EXTRACTOR
+    value: ffmpeg

@@ -4,7 +4,7 @@ controllers:
       web:
         image:
           repository: ghcr.io/hoarder-app/hoarder
-          tag: 0.21.0
+          tag: 0.22.0
         env:
           HOARDER_VERSION: release
           MEILI_ADDR: http://hoarder-meilisearch:7700
