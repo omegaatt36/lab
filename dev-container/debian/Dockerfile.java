@@ -2,7 +2,7 @@ ARG BASE_IMAGE=base-dev
 
 FROM ${BASE_IMAGE}
 
-ARG USERNAME=raiven_kao
+ARG USERNAME=coder
 
 USER root
 

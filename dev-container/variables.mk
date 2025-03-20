@@ -1,1 +1,0 @@
-IMAGE_REPOSITORY ?= omegaatt36

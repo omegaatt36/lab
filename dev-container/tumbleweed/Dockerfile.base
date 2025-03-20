@@ -1,6 +1,6 @@
 FROM opensuse/tumbleweed:latest
 
-ARG USERNAME=raiven_kao
+ARG USERNAME=coder
 
 RUN zypper refresh && zypper --non-interactive install \
     git vim curl zsh wget unzip \

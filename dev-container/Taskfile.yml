@@ -1,0 +1,72 @@
+version: "3"
+
+vars:
+  IMAGE_REPOSITORY: omegaatt36
+  NODE_VERSION: 22
+  USERNAME: coder
+
+tasks:
+  build-tumbleweed:
+    cmds:
+      - |
+        docker buildx build --platform linux/amd64,linux/arm64 \
+          -t {{.IMAGE_REPOSITORY}}/base-dev \
+          --build-arg USERNAME={{.USERNAME}} \
+          -f tumbleweed/Dockerfile.base . --push
+      - |
+        docker buildx build --platform linux/amd64,linux/arm64 \
+          -t {{.IMAGE_REPOSITORY}}/python-dev \
+          --build-arg BASE_IMAGE={{.IMAGE_REPOSITORY}}/base-dev \
+          --build-arg USERNAME={{.USERNAME}} \
+          -f tumbleweed/Dockerfile.python . --push
+      - |
+        docker buildx build --platform linux/amd64,linux/arm64 \
+          -t {{.IMAGE_REPOSITORY}}/node-dev \
+          --build-arg BASE_IMAGE={{.IMAGE_REPOSITORY}}/base-dev \
+          --build-arg USERNAME={{.USERNAME}} \
+          -f tumbleweed/Dockerfile.node . --push
+
+  build-debian:
+    cmds:
+      - |
+        docker buildx build --platform linux/amd64,linux/arm64 \
+          -t {{.IMAGE_REPOSITORY}}/base-dev \
+          --build-arg USERNAME={{.USERNAME}} \
+          -f debian/Dockerfile.base . --push
+      - |
+        docker buildx build --platform linux/amd64,linux/arm64 \
+          -t {{.IMAGE_REPOSITORY}}/python-dev \
+          --build-arg BASE_IMAGE={{.IMAGE_REPOSITORY}}/base-dev \
+          --build-arg USERNAME={{.USERNAME}} \
+          -f debian/Dockerfile.python . --push
+      - |
+        docker buildx build --platform linux/amd64,linux/arm64 \
+          -t {{.IMAGE_REPOSITORY}}/node-dev \
+          --build-arg NODE_VERSION={{.NODE_VERSION}} \
+          --build-arg BASE_IMAGE={{.IMAGE_REPOSITORY}}/base-dev \
+          --build-arg USERNAME={{.USERNAME}} \
+          -f debian/Dockerfile.node . --push
+      - |
+        docker buildx build --platform linux/amd64,linux/arm64 \
+          -t {{.IMAGE_REPOSITORY}}/java-dev \
+          --build-arg BASE_IMAGE={{.IMAGE_REPOSITORY}}/base-dev \
+          --build-arg USERNAME={{.USERNAME}} \
+          -f debian/Dockerfile.java . --push
+
+  build-npx:
+    cmds:
+      - |
+        docker buildx build --platform linux/amd64,linux/arm64 \
+          -t {{.IMAGE_REPOSITORY}}/npx \
+          --build-arg NODE_VERSION={{.NODE_VERSION}} \
+          --build-arg BASE_IMAGE={{.IMAGE_REPOSITORY}}/base-dev \
+          --build-arg USERNAME={{.USERNAME}} \
+          -f debian/Dockerfile.npx . --push
+
+  bin:
+    cmds:
+      - go build -o dev-container
+
+  install:
+    cmds:
+      - mv dev-container /usr/local/bin/
