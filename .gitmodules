@@ -1,0 +1,3 @@
+[submodule "komodo"]
+	path = komodo
+	url = git@github.com:omegaatt36/komodo.git
