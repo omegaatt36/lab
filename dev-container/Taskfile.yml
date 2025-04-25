@@ -11,19 +11,19 @@ tasks:
     cmds:
       - |
         docker buildx build --platform linux/amd64,linux/arm64 \
-          -t {{.IMAGE_REPOSITORY}}/ubuntu-dev \
+          -t {{.IMAGE_REPOSITORY}}/dev-container:noble \
           --target base \
           --build-arg USERNAME={{.USERNAME}} \
           -f ubuntu/Dockerfile . --push
       - |
         docker buildx build --platform linux/amd64,linux/arm64 \
-          -t {{.IMAGE_REPOSITORY}}/ubuntu-python-dev \
+          -t {{.IMAGE_REPOSITORY}}/dev-container:noble-python \
           --target python \
           --build-arg USERNAME={{.USERNAME}} \
           -f ubuntu/Dockerfile . --push
       - |
         docker buildx build --platform linux/amd64,linux/arm64 \
-          -t {{.IMAGE_REPOSITORY}}/ubuntu-node-dev \
+          -t {{.IMAGE_REPOSITORY}}/dev-container:noble-node \
           --target node \
           --build-arg NODE_VERSION={{.NODE_VERSION}} \
           --build-arg USERNAME={{.USERNAME}} \

@@ -84,7 +84,7 @@ WORKDIR /home/${USERNAME}
 FROM base AS node
 
 ARG USERNAME=coder
-ARG NODE_VERSION=22
+ARG NODE_VERSION=23
 
 USER root
 
@@ -127,9 +127,10 @@ WORKDIR /home/${USERNAME}
 # ==============================================================================
 # NPX stage (separate base image)
 # ==============================================================================
-FROM debian:bookworm AS npx
 
-ARG NODE_VERSION=22
+FROM ubuntu:noble AS npx
+
+ARG NODE_VERSION=23
 
 # Install dependencies
 RUN apt update && apt install -y --no-install-recommends \
