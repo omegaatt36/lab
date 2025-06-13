@@ -1,0 +1,62 @@
+version: 3
+
+silent: true
+
+vars:
+  DOCKER_GID:
+    sh: colima --profile dev ssh -- stat -c '%g' /var/run/docker.sock
+  HOST_USER: "{{.USER}}"
+  HOST_SSH_PUB:
+    sh: cat ~/.ssh/id_ed25519.zed.pub 2>/dev/null || echo ""
+  HOME_DIR:
+    sh: echo $HOME
+
+tasks:
+  build:
+    desc: Builds the development container image
+    preconditions:
+      - sh: '[ -n "{{.HOST_SSH_PUB}}" ]'
+        msg: "No SSH public key found. Please generate one with 'ssh-keygen -t ed25519'"
+    cmds:
+      - echo "Building Zed dev container with:"
+      - echo "  HOST_USER {{.HOST_USER}}"
+      - |
+        docker build --progress plain \
+          --build-arg HOST_USER="{{.HOST_USER}}" \
+          --build-arg HOST_SSH_PUB="{{.HOST_SSH_PUB}}" \
+          --build-arg DOCKER_GID="{{.DOCKER_GID}}" \
+          --build-arg TARGETARCH=arm64 \
+          -t zed-dev .
+
+  run:
+    desc: Runs the development container with git config and SSH keys mounted
+    deps: [build]
+    cmds:
+      # - |
+      #   docker run -d \
+      #     --name zed-dev \
+      #     -p 2222:22 \
+      #     -v /Users/raiven_kao/.colima/dev/docker.sock:/var/run/docker.sock \
+      #     -v "{{.ROOT_DIR}}/../../..:/home/{{.HOST_USER}}/work" \
+      #     -v "{{.HOME_DIR}}/.gitconfig:/home/{{.HOST_USER}}/.gitconfig:ro" \
+      #     -v "{{.HOME_DIR}}/.ssh:/home/{{.HOST_USER}}/.ssh:ro" \
+      #     -v "{{.HOME_DIR}}/.netrc:/home/{{.HOST_USER}}/.netrc:ro" \
+      #     zed-dev || echo "Note: Some git config files may not exist (this is normal)"
+      # - echo "Container started with git configuration and SSH keys mounted."
+      # - echo "You can SSH into it with:"
+      # - echo "ssh -p 2222 {{.HOST_USER}}@localhost"
+      # - echo ""
+      # - echo "Or stop it with:"
+      # - echo "task stop"
+
+      - |
+        docker run -d --name zed-remote \
+        --restart unless-stopped \
+        -w /home/$(whoami)/$(basename $(pwd)) \
+        -p 2222:22 \
+        -v ${HOME}/.gitconfig:/home/{{.HOST_USER}}/.gitconfig:ro \
+        -v $(pwd):/home/$(whoami)/$(basename $(pwd)) \
+        -v ${HOME}/.zsh_other_env:/home/coder/.zsh_other_env \
+        -v ${HOME}/.ssh/known_hosts:/home/$(whoami)/.ssh/known_hosts:ro \
+        -v /Users/raiven_kao/.colima/dev/docker.sock:/var/run/docker.sock \
+        zed-dev

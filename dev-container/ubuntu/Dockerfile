@@ -6,8 +6,7 @@ ARG USERNAME=coder
 # Install base dependencies
 RUN apt update && apt install -y --no-install-recommends \
     git vim curl zsh wget unzip gpg make \
-    fd-find bat ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+    fd-find bat ca-certificates
 
 # Create the user
 RUN useradd -m -U -s /bin/zsh ${USERNAME}
