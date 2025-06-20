@@ -10,6 +10,7 @@ vars:
     sh: cat ~/.ssh/id_ed25519.zed.pub 2>/dev/null || echo ""
   HOME_DIR:
     sh: echo $HOME
+  TARGETARCH: arm64
 
 tasks:
   build:
@@ -22,10 +23,11 @@ tasks:
       - echo "  HOST_USER {{.HOST_USER}}"
       - |
         docker build --progress plain \
+          --platform linux/{{.TARGETARCH}} \
           --build-arg HOST_USER="{{.HOST_USER}}" \
           --build-arg HOST_SSH_PUB="{{.HOST_SSH_PUB}}" \
           --build-arg DOCKER_GID="{{.DOCKER_GID}}" \
-          --build-arg TARGETARCH=arm64 \
+          --build-arg TARGETARCH={{.TARGETARCH}} \
           -t zed-dev .
 
   run:
