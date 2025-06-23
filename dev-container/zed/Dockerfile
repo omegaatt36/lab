@@ -1,13 +1,11 @@
 ARG HOST_USER
 ARG HOST_SSH_PUB
-ARG DOCKER_GID
 ARG TARGETARCH=arm64
 
 FROM ubuntu:24.04
 
 ARG HOST_USER
 ARG HOST_SSH_PUB
-ARG DOCKER_GID
 ARG TARGETARCH
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
@@ -16,9 +14,9 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Install base dependencies and project-specific dependencies
-RUN apt-get update -y \
-    && apt-get upgrade -y \
-    && apt-get install -y --no-install-recommends \
+RUN apt update -y \
+    && apt upgrade -y \
+    && apt install -y --no-install-recommends \
     sudo curl openssh-server ca-certificates \
     apt-transport-https gnupg lsb-release wget \
     build-essential git python3 python3-pip \
@@ -30,7 +28,8 @@ RUN apt-get update -y \
     libevent-core-2.1-7t64 \
     libboost-dev libboost-program-options-dev libboost-filesystem-dev \
     zlib1g-dev \
-    logrotate supervisor libxml2-dev libssl3 libssl-dev
+    logrotate supervisor libxml2-dev libssl3 libssl-dev \
+    && apt clean && sudo rm -rf /var/lib/apt/lists/*
 
 # Generate en_US.UTF-8 locale
 RUN echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen \
@@ -43,11 +42,6 @@ ENV LANGUAGE en_US.UTF-8
 
 COPY ./debs/hiredis-ssl-1.2.0-noble-${TARGETARCH}.deb /tmp/hiredis-ssl.deb
 RUN dpkg -i /tmp/hiredis-ssl.deb && rm /tmp/hiredis-ssl.deb
-
-# Docker GPG Key and apt repository setup (for installing Docker CE client tools if needed)
-RUN install -m 0755 -d /etc/apt/keyrings && \
-    curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc && \
-    chmod a+r /etc/apt/keyrings/docker.asc
 
 # Create user and set up sudo
 RUN useradd -m -s /bin/zsh "$HOST_USER" \
@@ -67,25 +61,6 @@ RUN chmod +x install_wakatime-cli.sh && bash -c ./install_wakatime-cli.sh && rm 
 USER $HOST_USER
 ENV HOME=/home/${HOST_USER}
 WORKDIR ${HOME}
-
-# Docker CE installation (Consider mounting host Docker socket instead for local dev)
-RUN echo \
-    "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-    $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}") stable" | \
-    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-RUN sudo apt-get update && \
-    sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin && \
-    sudo apt-get clean && sudo rm -rf /var/lib/apt/lists/*
-
-# Docker group setup
-RUN if getent group docker; then \
-    sudo groupmod -g $DOCKER_GID docker; \
-    else \
-    sudo groupadd -g $DOCKER_GID docker; \
-    fi \
-    && sudo usermod -aG docker "$HOST_USER"
-
-RUN sudo docker --version
 
 # Create .ssh directory for SSH key mounting
 RUN mkdir -p ${HOME}/.ssh \
