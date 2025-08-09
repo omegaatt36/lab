@@ -1,0 +1,34 @@
+image:
+  repository: ghcr.io/everywall/ladder
+  tag: latest
+
+env:
+  PORT: 8080
+  PREFORK: "false"
+  USER_AGENT: "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
+  X_FORWARDED_FOR:
+  USERPASS: ""
+  LOG_URLS: "true"
+  DISABLE_FORM: "false"
+  FORM_PATH: ""
+  RULESET: "https://raw.githubusercontent.com/everywall/ladder/main/ruleset.yaml"
+  EXPOSE_RULESET: "true"
+  ALLOWED_DOMAINS: ""
+  ALLOWED_DOMAINS_RULESET: "false"
+
+service:
+  type: ClusterIP
+  targetPort: 8080
+  port: 80
+  nodePort: 80
+
+ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-cloudflare"
+  enabled: true
+  class: "nginx"
+  tls:
+    hostname: ladder.omegaatt.com
+    secretName: omegaatt-tls
+  hostname: ladder.omegaatt.com
+  path: /

@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ladder.fullname" . }}
+  labels:
+    {{- include "ladder.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "ladder.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ladder.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.targetPort }}
+        resources:
+          limits:
+            cpu: 250m
+            memory: 128Mi
+          requests:
+            cpu: 250m
+            memory: 128Mi
+        env:
+          - name: PORT
+            value: "{{ .Values.env.PORT }}"
+          - name: PREFORK
+            value: "{{ .Values.env.PREFORK }}"
+          - name: USER_AGENT
+            value: "{{ .Values.env.USER_AGENT }}"
+          - name: X_FORWARDED_FOR
+            value: "{{ .Values.env.X_FORWARDED_FOR }}"
+          - name: USERPASS
+            value: "{{ .Values.env.USERPASS }}"
+          - name: LOG_URLS
+            value: "{{ .Values.env.LOG_URLS }}"
+          - name: DISABLE_FORM
+            value: "{{ .Values.env.DISABLE_FORM }}"
+          - name: FORM_PATH
+            value: "{{ .Values.env.FORM_PATH }}"
+          - name: RULESET
+            value: "{{ .Values.env.RULESET }}"
+          - name: EXPOSE_RULESET
+            value: "{{ .Values.env.EXPOSE_RULESET }}"
+          - name: ALLOWED_DOMAINS
+            value: "{{ .Values.env.ALLOWED_DOMAINS }}"
+          - name: ALLOWED_DOMAINS_RULESET
+            value: "{{ .Values.env.ALLOWED_DOMAINS_RULESET }}"
+      terminationGracePeriodSeconds: 30
