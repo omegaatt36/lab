@@ -1,0 +1,24 @@
+image:
+  repository: ghcr.io/mermaid-js/mermaid-live-editor
+  tag: latest
+
+env:
+  PORT: 8080
+  MERMAID_DOMAIN: mermaid.omegaatt.com
+
+service:
+  type: ClusterIP
+  targetPort: 8080
+  port: 80
+  nodePort: 80
+
+ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-cloudflare"
+  enabled: true
+  class: "nginx"
+  tls:
+    hostname: mermaid.omegaatt.com
+    secretName: omegaatt-tls
+  hostname: mermaid.omegaatt.com
+  path: /
