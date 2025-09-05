@@ -2,7 +2,7 @@ ARG HOST_USER
 ARG HOST_SSH_PUB
 ARG TARGETARCH=arm64
 
-FROM ubuntu:24.04
+FROM ubuntu:25.04
 
 ARG HOST_USER
 ARG HOST_SSH_PUB
@@ -28,7 +28,7 @@ RUN apt update -y \
     libevent-core-2.1-7t64 \
     libboost-dev libboost-program-options-dev libboost-filesystem-dev \
     zlib1g-dev \
-    logrotate supervisor libxml2-dev libssl3 libssl-dev \
+    logrotate libxml2-dev libssl3 libssl-dev \
     && apt clean && sudo rm -rf /var/lib/apt/lists/*
 
 # Generate en_US.UTF-8 locale
@@ -76,8 +76,8 @@ RUN <<EOF
     touch ${HOME}/.vimrc
 EOF
 
-# Install Golang 1.24.4
-ENV GOLANG_VERSION 1.24.4
+# Install Golang
+ENV GOLANG_VERSION 1.25.0
 RUN wget -q https://go.dev/dl/go${GOLANG_VERSION}.linux-${TARGETARCH}.tar.gz \
     && tar -xzf go${GOLANG_VERSION}.linux-${TARGETARCH}.tar.gz \
     && sudo cp go /usr/local -R \
@@ -111,6 +111,8 @@ RUN bash -c "git clone --depth 1 https://github.com/junegunn/fzf.git "${HOME}"/.
     && curl -fLo ${HOME}/.fzf/fzf-git.sh https://raw.githubusercontent.com/junegunn/fzf-git.sh/main/fzf-git.sh \
     && yes | "${HOME}"/.fzf/install"
 
+RUN curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+
 # Install vim plugins
 RUN <<EOF
     curl -fLo "${HOME}"/.vim/autoload/plug.vim --create-dirs \
@@ -128,16 +130,7 @@ RUN curl -fL https://install-cli.jfrog.io | sh
 # Note: Consider if Zed editor needs to be installed system-wide or for the user
 RUN curl -fsSL https://zed.dev/install.sh | SHELL=/bin/zsh sh
 
-# Symlinking Zed's bundled libssl can be fragile.
-# It's better if Zed can use system libraries or bundle them in a way that doesn't require system-level links.
-# This is kept as per your original file but consider alternatives if issues arise.
-RUN if [ "$(dpkg --print-architecture)" = "arm64" ]; then \
-    sudo ln -sf /home/$HOST_USER/.local/bin/zed.app/lib/libssl.so.1.1 /usr/lib/aarch64-linux-gnu/libssl.so.1.1 || true \
-    && sudo ln -sf /home/$HOST_USER/.local/bin/zed.app/lib/libcrypto.so.1.1 /usr/lib/aarch64-linux-gnu/libcrypto.so.1.1 || true; \
-    else \
-    sudo ln -sf /home/$HOST_USER/.local/bin/zed.app/lib/libssl.so.1.1 /usr/lib/x86_64-linux-gnu/libssl.so.1.1 || true \
-    && sudo ln -sf /home/$HOST_USER/.local/bin/zed.app/lib/libcrypto.so.1.1 /usr/lib/x86_64-linux-gnu/libcrypto.so.1.1 || true; \
-    fi
-
 EXPOSE 22
+EXPOSE 50051
+EXPOSE 1344
 ENTRYPOINT ["sudo", "/usr/sbin/sshd", "-D"]

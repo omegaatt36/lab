@@ -69,10 +69,11 @@ Then see the result:
 
 ```sh
 ❯ docker image ls -a
-REPOSITORY                         TAG       IMAGE ID       CREATED        SIZE
-node-dev                           latest    3d5746d1b9f5   17 hours ago   686MB
-base-dev                           latest    6e29436b84c6   17 hours ago   553MB
-python-dev                         latest    6e29436b84c6   17 hours ago   553MB
+REPOSITORY                         TAG                    IMAGE ID       CREATED        SIZE
+omegaatt36/dev-container          noble-claude-code      8a7b9c2d3e4f   2 hours ago    742MB
+omegaatt36/dev-container          noble-node             3d5746d1b9f5   17 hours ago   686MB
+omegaatt36/dev-container          noble                  6e29436b84c6   17 hours ago   553MB
+omegaatt36/dev-container          noble-python           6e29436b84c6   17 hours ago   553MB
 ```
 
 ## Customization

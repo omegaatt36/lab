@@ -9,25 +9,37 @@ tasks:
   build-ubuntu:
     desc: Builds Ubuntu-based development images using the multi-stage Dockerfile
     cmds:
+      # - |
+      #   docker buildx build --platform linux/amd64,linux/arm64 \
+      #     -t {{.IMAGE_REPOSITORY}}/dev-container:noble \
+      #     --target base \
+      #     --build-arg USERNAME={{.USERNAME}} \
+      #     -f ubuntu/Dockerfile . --push
+      # - |
+      #   docker buildx build --platform linux/amd64,linux/arm64 \
+      #     -t {{.IMAGE_REPOSITORY}}/dev-container:noble-python \
+      #     --target python \
+      #     --build-arg USERNAME={{.USERNAME}} \
+      #     -f ubuntu/Dockerfile . --push
+      # - |
+      #   docker buildx build --platform linux/amd64,linux/arm64 \
+      #     -t {{.IMAGE_REPOSITORY}}/dev-container:noble-node \
+      #     --target node \
+      #     --build-arg NODE_VERSION={{.NODE_VERSION}} \
+      #     --build-arg USERNAME={{.USERNAME}} \
+      #     -f ubuntu/Dockerfile . --push
+      # - |
+      #   docker buildx build --platform linux/arm64 \
+      #     -t {{.IMAGE_REPOSITORY}}/dev-container:noble-claude-code \
+      #     --target claude-code \
+      #     --build-arg NODE_VERSION={{.NODE_VERSION}} \
+      #     --build-arg USERNAME={{.USERNAME}} \
+      #     -f ubuntu/Dockerfile . --load
       - |
-        docker buildx build --platform linux/amd64,linux/arm64 \
-          -t {{.IMAGE_REPOSITORY}}/dev-container:noble \
-          --target base \
+        docker build \
+          -t {{.IMAGE_REPOSITORY}}/ubuntu-java-dev \
+          --target java \
           --build-arg USERNAME={{.USERNAME}} \
-          -f ubuntu/Dockerfile . --push
-      - |
-        docker buildx build --platform linux/amd64,linux/arm64 \
-          -t {{.IMAGE_REPOSITORY}}/dev-container:noble-python \
-          --target python \
-          --build-arg USERNAME={{.USERNAME}} \
-          -f ubuntu/Dockerfile . --push
-      - |
-        docker buildx build --platform linux/amd64,linux/arm64 \
-          -t {{.IMAGE_REPOSITORY}}/dev-container:noble-node \
-          --target node \
-          --build-arg NODE_VERSION={{.NODE_VERSION}} \
-          --build-arg USERNAME={{.USERNAME}} \
-          -f ubuntu/Dockerfile . --push
       # - |
       #   docker build \
       #     -t {{.IMAGE_REPOSITORY}}/ubuntu-java-dev \
