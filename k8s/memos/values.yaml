@@ -1,0 +1,30 @@
+image:
+  repository: neosmemo/memos
+  tag: "stable"
+
+common:
+  mode: prod
+  port: 5230
+
+service:
+  type: ClusterIP
+  targetPort: 5230
+  port: 5230
+  nodePort: 5230
+
+persistence:
+  enabled: true
+  existingClaim: memos-pvc
+
+ingress:
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-cloudflare"
+  enabled: true
+  class: "nginx"
+  tls:
+    hostname: memos.omegaatt.com
+    secretName: omegaatt-tls
+  hostname: memos.omegaatt.com
+  path: /
+
+securityContext: {}

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "memos.fullname" . }}
+  labels:
+    {{- include "memos.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "memos.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "memos.selectorLabels" . | nindent 8 }}
+    spec:
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ .Values.persistence.existingClaim }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        ports:
+        - name: http
+          containerPort: {{ .Values.service.targetPort }}
+        volumeMounts:
+        - name: data
+          mountPath: /var/opt/memos
+        env:
+        - name: MEMOS_MODE
+          value: {{ .Values.common.mode | quote }}
+        - name: MEMOS_PORT
+          value: {{ .Values.common.port | quote }}
+        - name: MEMOS_DATA
+          value: "/var/opt/memos"
+        - name: MEMOS_DRIVER
+          value: "sqlite"
+        - name: MEMOS_DSN
+          value: "/var/opt/memos/memos_prod.db"
